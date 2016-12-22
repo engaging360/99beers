@@ -1,0 +1,254 @@
+<!-- The main idea we would like to explore is the creation of a worldwide map that connects with the data. Ideally, there should be a selector screen or slicer in the top left hand corner where we select the view (by region, market or reporting market). Once we select that, we would like to be able to hover the mouse over an area and this will highlight the market. Then if we click that would generate the values for the market, below the graph as well as 4 graphs that will compare the key figures (ship vs target, ship vs LY, sales vs target, ship vs sales).
+
+
+In addition, i was wondering if you could check one more functionality, which has to do with the historical heat map. In other words, it would be cool to see a chronological bar in the end of the map that we could move and see heat areas across the years on the map.
+
+
+On top of that, we would like to have slicers next to the map with brands. In that way we can select one or more graphs and see which areas in the map are highlighted and how the graphs dynamically change to the requirements. -->
+
+<html>
+<head>
+   	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+   	<script type="text/javascript">
+     	google.charts.load('upcoming', {'packages':['geochart', 'controls', 'table', 'corechart', 'bar']});
+     	google.charts.setOnLoadCallback(drawRegionsMap);
+     	function drawRegionsMap() {
+     		// Dashboard where the graphs and controls are handled
+     		var dashboard = new google.visualization.Dashboard(document.getElementById('dashboard_div'));
+     		// DataTable with the raw data from Excel
+       		var data = new google.visualization.DataTable();
+       		// Default column to display = 3 (Shipments)
+       		var colDisplayed = 3;
+       		// Default resolution displayed = continents
+       		var resDisplayed = 'continents';
+       		// Default name column (continents = 0, subcontinents = 1 or countries = 2). Changes along with resDisplayed
+       		var areaDisplayed = 0
+       		// map options
+       		var mapOptions;
+       		// Aggregated data used for the maps and bar charts. Elements are added from the DataView by using the areaDisplayed as index. e.g. 
+       		// if continents is selected, rows with the same continent will be aggregated (added) into a single one, representing the figures 
+       		// of all entries of that area
+       		var aggregated;
+       		// Table filtered data, filtered whenever a region is clicked on the map
+       		var tableData;
+       		// Data formatted for the charts
+       		var chart1Data;
+       		var chart2Data;
+       		var chart3Data;
+       		var chart4Data;
+       		// The geoChart object to display the map
+       		var map = new google.visualization.GeoChart(document.getElementById('regions_div'));
+       		// Table displaying data from the selected region
+       		var table = new google.visualization.Table(document.getElementById('table_div'));
+       		// Charts displaying data from the selected region
+       		var chart1 = new google.visualization.ColumnChart(document.getElementById('chart1_div'));
+       		var chart2 = new google.visualization.ColumnChart(document.getElementById('chart2_div'));
+       		var chart3 = new google.visualization.ColumnChart(document.getElementById('chart3_div'));
+       		var chart4 = new google.visualization.ColumnChart(document.getElementById('chart4_div'));
+
+       		// Initializing the data array. This part of the code will be substituted by automatic generation in VBA from the Excel macro.
+       		data.addColumn('string', 'Region');
+       		data.addColumn('string', 'Market');
+       		data.addColumn('string', 'Reporting Market');
+       		data.addColumn('number', 'Ship');
+       		data.addColumn('number', 'Ship Target');
+       		data.addColumn('number', 'LY Ship');
+       		data.addColumn('number', 'Sales');
+       		data.addColumn('number', 'Sales Target');
+       		data.addColumn('number', 'LY Sales');
+       		data.addRows([
+        		['002', '014', 'Tanzania', 	6453, 2000, 3456, 6485, 7456, 3003],
+        		['002', '011', 'Nigeria', 	6433, 2854, 6543, 2004, 4556, 3003],
+        		['002', '015', 'Ghana', 	8353, 8546, 4567, 3544, 2400, 3452],
+        		['150', '154', 'Denmark', 	2443, 2000, 7654, 3445, 7554, 3003],
+        		['150', '154', 'Estonia', 	9453, 2454, 5678, 7534, 2400, 6432],
+        		['150', '155', 'Austria', 	2276, 1854, 9876, 2020, 6645, 6453],
+        		['150', '039', 'Greece', 	6574, 5648, 6789, 5344, 3345, 3004],
+        		['150', '151', 'Russia', 	9553, 7453, 3456, 7455, 2600, 5433],
+        		['019', '021', 'United States', 8644, 7354, 6543, 7554, 2700, 2334],
+        		['019', '021', {v: 'Canada', f: "Canada ..eh?"}, 	1363, 7548, 2345, 2355, 7445, 3040],
+        		['019', '013', 'Mexico', 	3647, 2734, 5432, 1253, 2070, 8526],
+        		['019', '013', 'Mexico', 	2454, 3485, 3456, 6443, 2040, 3030],
+        		['019', '013', 'Mexico', 	5323, 2000, 2345, 2336, 7554, 3254],
+        		['019', '029', 'Cuba', 		2453, 5965, 6234, 7524, 6435, 4543],
+        		['019', '013', 'Belize', 	2754, 5679, 7345, 8576, 6345, 2334],
+        		['019', '005', 'Bolivia', 	8434, 5067, 4576, 3545, 6243, 7425],
+        		['142', '143', 'Turkemistan', 7443, 5646, 8245, 7445, 2300, 3345],
+        		['142', '030', 'China', 	2753, 5685, 8345, 8556, 2040, 4556],
+        		['142', '030', 'Mongolia', 	2846, 1234, 7453, 3445, 4344, 5657],
+        		['142', '034', 'Afghanistan', 7344, 2345, 4573, 3456, 5355, 6578],
+        		['142', '034', 'India', 	4577, 3456, 7345, 7435, 2020, 7859],
+        		['142', '035', 'Indonesia', 8565, 4567, 3000, 2500, 3345, 8940],
+        		['142', '145', 'Armenia', 	3455, 5678, 7543, 8745, 6334, 6543],
+        		['009', '053', 'Australia', 2856, 6789, 7458, 9746, 6433, 5433],
+        		['009', '053', 'New Zealand', 8456, 7890, 4586, 7356, 6366, 6354],
+        		['009', '054', 'Fiji', 		2574, 7654, 9657, 4546, 7737, 7365],
+       		]);
+
+			// Populate table data into a DataView (not a DataTable!!)
+			tableData = new google.visualization.DataView(data);
+       		// Initial draw of the map 
+       		redrawMap();
+
+       		//option 2, just selecting rows 2, 3 and 4 for the output   NOT IN USE RIGHT NOW---!
+       		//var view = new google.visualization.DataView(data);
+       		//view.setColumns([2,3, 4]);
+
+       		//example of how to do calculations (e.g. maybe we want to sum all 12 periods?) on table ----!
+       		// Underlying table has a column specifying a value in centimeters.               
+       		// The view imports this directly, and creates a calculated addColumn            
+       		// that converts the value into inches.                                           
+       		//view.setColumns([1,{calc:cmToInches, type:'number', label:'Height in Inches'}]);  
+       		//  function cmToInches(dataTable, rowNum){                                         
+       		//    return Math.floor(dataTable.getValue(rowNum, 1) / 2.54);                      
+       		//  }                                                                               
+
+
+       		// Draws or redraws the map with the selected options and data
+   			function redrawMap(){
+   				// Select which column to aggregate by (areaDisplayed) and which data column to display (colDisplayed) in the map
+   				aggregated = google.visualization.data.group(data, [areaDisplayed], [{'column': colDisplayed, 'aggregation': google.visualization.data.sum, 'type': 'number'}]);
+				mapOptions = {
+       			region: 'world', 
+       			resolution: resDisplayed,
+       			backgroundColor: {fill: '#81d4fa', stroke: '#000000', strokeWidth: 1},
+    		   	colorAxis: {colors: ['#f4ee42', '#46ad13']},
+    		   	enableRegionInteractivity: 'true',
+    		   	};  
+    			// draw / redraw map
+    	   		map.draw(aggregated, mapOptions); 				
+   			}
+
+   			// Functions to change the map resolution display type with the corresponding change in data to aggregate by
+      		byRegion = function(){
+      		  	areaDisplayed = 0;
+      		  	resDisplayed = 'continents'
+      		  	redrawMap();
+      		}
+      		byMarket = function() {
+      			areaDisplayed = 1;
+      		  	resDisplayed = 'subcontinents'
+      		  	redrawMap();
+      		}
+      		byRepMarket = function() {
+      			areaDisplayed = 2;
+      		  	resDisplayed = 'countries'
+      		  	redrawMap();
+      		}
+
+      		// Functions to change the data column chosen to display in map
+      		showShip = function(){
+				colDisplayed = 3;
+      		  	redrawMap();
+      		}
+      		showShipT = function(){
+				colDisplayed = 4;
+      		  	redrawMap();
+      		}
+      		showShipLY = function(){
+				colDisplayed = 5;
+      		  	redrawMap();
+      		}
+			showSales = function(){
+				colDisplayed = 6;
+      		  	redrawMap();
+      		}
+      		showSalesT = function(){
+				colDisplayed = 7;
+      		  	redrawMap();
+      		}
+      		showSalesLY = function(){
+				colDisplayed = 8;
+      		  	redrawMap();
+      		}
+
+			// Callback function that handles clicks on the map regions
+   			function clickHandler(){
+       			var selection = map.getSelection();
+       			var region = aggregated.getValue(selection[0].row, 0);
+       			// alert('You selected ' + region);
+				tableData.setRows(data.getFilteredRows([{column: areaDisplayed, value: region}]))
+       			table.draw(tableData, {showRowNumber: true});
+       			chart1Data = google.visualization.data.group(tableData, [areaDisplayed], 
+       				[	{'column': 3, 'aggregation': google.visualization.data.sum, 'type': 'number'},
+       					{'column': 4, 'aggregation': google.visualization.data.sum, 'type': 'number'}
+       				]
+       			);
+       			chart1.draw(chart1Data, {title: 'Ship vs Target', vAxis: {minValue: 0, title: 'Whatever'}, animation:{duration: 1000, easing: 'out'}});
+       			chart2Data = google.visualization.data.group(tableData, [areaDisplayed], 
+       				[	{'column': 3, 'aggregation': google.visualization.data.sum, 'type': 'number'},
+       					{'column': 5, 'aggregation': google.visualization.data.sum, 'type': 'number'}
+       				]
+       			);
+       			chart2.draw(chart1Data, {title: 'Ship vs Ship LY', vAxis: {minValue: 0, title: 'Whatever'}, animation:{duration: 1000, easing: 'out'}});
+       			chart3Data = google.visualization.data.group(tableData, [areaDisplayed], 
+       				[	{'column': 6, 'aggregation': google.visualization.data.sum, 'type': 'number'},
+       					{'column': 7, 'aggregation': google.visualization.data.sum, 'type': 'number'}
+       				]
+       			);
+       			chart3.draw(chart1Data, {title: 'Sales vs Target', vAxis: {minValue: 0, title: 'Whatever'}, animation:{duration: 1000, easing: 'out'}});
+       			chart4Data = google.visualization.data.group(tableData, [areaDisplayed], 
+       				[	{'column': 6, 'aggregation': google.visualization.data.sum, 'type': 'number'},
+       					{'column': 8, 'aggregation': google.visualization.data.sum, 'type': 'number'}
+       				]
+       			);
+       			chart4.draw(chart1Data, {title: 'Sales vs Sales LY', vAxis: {minValue: 0, title: 'Whatever'}, animation:{duration: 1000, easing: 'out'}});
+   			}
+   			// Add callback to click on map event
+   			google.visualization.events.addListener(map, 'select', clickHandler);
+     	}
+   	</script>
+</head>
+<body>
+<div id="dashboard_div">
+   	<div align="center">
+   	   	<select size="1" name="regSelect" id="regSelect" onchange="changeDispRes(this);">
+			<option value="Region" SELECTED>Region</option>
+			<option value="Market">Market</option>
+			<option value="RepMarket">Reporting Market</option>
+		</select>
+   	    <script type="text/javascript">
+   	      	function changeDispRes(el) {
+   				window["by" + el.options[el.selectedIndex].value]();
+			}
+   	    </script>
+   	    <select size="1" name="dataSelect" id="dataSelect" onchange="changeDispData(this);">
+			<option value="Ship" SELECTED>Ship</option>
+			<option value="ShipT">Ship Target</option>
+			<option value="ShipLY">LY Ship</option>
+			<option value="Sales" >Sales</option>
+			<option value="SalesT">Sales Target</option>
+			<option value="SalesLY">LY Sales</option>
+		</select>   
+   	    <script type="text/javascript">
+   	      	function changeDispData(el) {
+   				window["show" + el.options[el.selectedIndex].value]();
+			}
+   	    </script>     
+   	</div>
+   	<div id="regions_div" style="width: 50%; height: 50%; margin:0 auto;" ></div>
+   	<br>
+   	<div align="center">
+   		<table class="columns">
+   			<tr>
+   				<td>
+   					<div id="chart1_div"></div>
+   				</td>
+   				<td>
+   					<div id="chart2_div"></div>
+   				</td>
+   			</tr>
+   			<tr>
+   				<td>
+   					<div id="chart3_div"></div>
+   				</td>
+   				<td>
+   					<div id="chart4_div"></div>
+   				</td>
+   			</tr>
+   		</table>
+   	</div>
+   	<div id="table_div" style="padding-top: 30px" align="center"></div>
+</body>
+</html>
+
