@@ -8,6 +8,100 @@ On top of that, we would like to have slicers next to the map with brands. In th
 
 <html>
 <head>
+    
+    <style>
+        body {
+            margin: 0;
+        }
+        
+        div.container {
+            width: 100%;
+            background-color: white;
+        }
+
+        header {
+            padding: 0em;
+            margin-bottom: 1em;
+            color: #607D8B;
+            background-color: #F5F5F5;
+            border-bottom-width: thin;
+            border-bottom-color: #BDBDBD;
+            border-bottom-style:inset;
+            clear: left;
+            text-align: left;
+        }
+        
+        footer {
+            padding: 0.5em;
+            padding-left: 30px;
+            margin-top: 2em;
+            color: #607D8B;
+            background-color: #F5F5F5;
+            border-bottom-width: thin;
+            border-bottom-color: #BDBDBD;
+            border-bottom-style:inset;
+            clear: left;
+            text-align: left;
+            font-family: Courier New;
+        }
+        
+        h1 {
+            padding-top: 0.2em;
+            padding-bottom: 0.2em;
+            padding-left: 0;
+            padding-right: 0.2em;
+            margin-top: 0;
+            margin-bottom: 0;
+            margin-left: 30px;
+            margin-right: 0;
+            font-family: Georgia;
+        }
+        
+        a {
+            color: inherit;
+            text-decoration: inherit;
+        }
+        
+        label {
+            font-weight: bold;
+        }
+        
+        form {
+            margin: 0;
+        }
+
+        nav {
+            float: left;
+            max-width: 160px;
+            margin-top: 1em;
+            margin-left: 30px;
+            padding-right: 1em;
+            border-right-width: medium;
+            border-right-color: #ECEFF1;
+            border-right-style: solid;
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0px;
+            margin: 0em;
+            margin-top: 0.2em;
+            max-height: 15em;
+            overflow: scroll;
+            background-color: white;
+        }
+
+        nav ul a {
+            text-decoration: none;
+        }
+
+        article {
+            margin-left: 0px;
+            padding: 1em;
+            overflow: hidden;
+        }
+    </style>
+    
    	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
    	<script type="text/javascript">
      	google.charts.load('upcoming', {'packages':['geochart', 'controls', 'table', 'corechart', 'bar']});
@@ -23,6 +117,8 @@ On top of that, we would like to have slicers next to the map with brands. In th
        		var resDisplayed = 'continents';
        		// Default name column (continents = 0, subcontinents = 1 or countries = 2). Changes along with resDisplayed
        		var areaDisplayed = 0
+            // Default map focus
+            var mapFoc = 'world';
        		// map options
        		var mapOptions;
        		// Aggregated data used for the maps and bar charts. Elements are added from the DataView by using the areaDisplayed as index. e.g. 
@@ -96,6 +192,7 @@ On top of that, we would like to have slicers next to the map with brands. In th
 
 			// Populate table data into a DataView (not a DataTable!!)
 			tableData = new google.visualization.DataView(data);
+            dataView = new google.visualization.DataView(data);
             
             // Add checkboxes based on the set of brands found in the table
             addCheckbox();
@@ -162,7 +259,7 @@ On top of that, we would like to have slicers next to the map with brands. In th
    			// Draws or redraws the map with the selected options and data
             function redrawMap(){
    				// Select which column to aggregate by (areaDisplayed) and which data column to display (colDisplayed) in the map
-                dataView = new google.visualization.DataView(data);
+                
                 
                 dataView.setRows(data.getFilteredRows([{
                     column: 9, 
@@ -180,9 +277,9 @@ On top of that, we would like to have slicers next to the map with brands. In th
                 
                 dataViewAggr = google.visualization.data.group(dataView, [areaDisplayed], [{'column': colDisplayed, 'aggregation': google.visualization.data.sum, 'type': 'number'}]);
 				mapOptions = {
-                    region: 'world', 
+                    region: mapFoc, 
                     resolution: resDisplayed,
-                    backgroundColor: {fill: '#81d4fa', stroke: '#000000', strokeWidth: 1},
+                    backgroundColor: {fill: '#81d4fa', stroke: '#000000', strokeWidth: 0},
                     colorAxis: {colors: ['#f4ee42', '#46ad13']},
                     enableRegionInteractivity: 'true',
 //                    animation: {duration: 2000, easing: 'out'},
@@ -244,33 +341,59 @@ On top of that, we would like to have slicers next to the map with brands. In th
 				colDisplayed = 8;
       		  	redrawMap();
       		}
+            
+            // Function to change the map focus
+            mapFocus = function(value){
+                mapFoc = value;
+                redrawMap();
+            }
 
 			// Callback function that handles clicks on the map regions
    			function clickHandler(){
        			var selection = map.getSelection();
        			var region = dataViewAggr.getValue(selection[0].row, 0);
-       			// alert('You selected ' + region);
-				tableData.setRows(data.getFilteredRows([{column: areaDisplayed, value: region}]))
-       			table.draw(tableData, {showRowNumber: true});
-       			chart1Data = google.visualization.data.group(tableData, [areaDisplayed], 
+				//tableData.setRows(data.getFilteredRows([{column: areaDisplayed, value: region}]))
+
+                dataView.setRows(data.getFilteredRows([{
+                    column: 9, 
+                    test: function (value, row, column, table) {
+                        var res = false;
+                        for (var i=0; i<brandsArray.length; i++) {
+                            if ((brandsArray[i].brand == value) &&
+                                (brandsArray[i].checked) &&
+                                (data.getValue(row, areaDisplayed) == region)) {
+                                res = true;
+                                break;
+                            }
+                        }
+                        return (res);
+                    }
+                }]));
+                
+       			table.draw(dataView, {showRowNumber: true});
+       			
+                chart1Data = google.visualization.data.group(dataView, [areaDisplayed], 
        				[	{'column': 3, 'aggregation': google.visualization.data.sum, 'type': 'number'},
        					{'column': 4, 'aggregation': google.visualization.data.sum, 'type': 'number'}
        				]
        			);
        			chart1.draw(chart1Data, {title: 'Ship vs Target', vAxis: {minValue: 0, title: 'Whatever'}, animation:{startup: true, duration: 1000, easing: 'out'}});
-       			chart2Data = google.visualization.data.group(tableData, [areaDisplayed], 
+       			
+                chart2Data = google.visualization.data.group(dataView, [areaDisplayed], 
        				[	{'column': 3, 'aggregation': google.visualization.data.sum, 'type': 'number'},
        					{'column': 5, 'aggregation': google.visualization.data.sum, 'type': 'number'}
        				]
        			);
        			chart2.draw(chart2Data, {title: 'Ship vs Ship LY', vAxis: {minValue: 0, title: 'Whatever'}, animation:{startup: true, duration: 1000, easing: 'out'}});
-       			chart3Data = google.visualization.data.group(tableData, [areaDisplayed], 
+       			
+                chart3Data = google.visualization.data.group(dataView, [areaDisplayed], 
        				[	{'column': 6, 'aggregation': google.visualization.data.sum, 'type': 'number'},
        					{'column': 7, 'aggregation': google.visualization.data.sum, 'type': 'number'}
        				]
        			);
        			chart3.draw(chart3Data, {title: 'Sales vs Target', vAxis: {minValue: 0, title: 'Whatever'}, animation:{startup: true, duration: 1000, easing: 'out'}});
-       			chart4Data = google.visualization.data.group(tableData, [areaDisplayed], 
+       			
+                chart4Data = google.visualization.data.group(dataView, [areaDisplayed], 
        				[	{'column': 6, 'aggregation': google.visualization.data.sum, 'type': 'number'},
        					{'column': 8, 'aggregation': google.visualization.data.sum, 'type': 'number'}
        				]
@@ -283,71 +406,125 @@ On top of that, we would like to have slicers next to the map with brands. In th
    	</script>
 </head>
 <body>
-<div id="dashboard_div">
+<div id="dashboard_div" class="container">
     
-   	<div align="center" style="padding-bottom: 10px">
-   	   	<select size="1" name="regSelect" id="regSelect" onchange="changeDispRes(this);">
-			<option value="Region" SELECTED>Region</option>
-			<option value="Market">Market</option>
-			<option value="RepMarket">Reporting Market</option>
-		</select>
-   	    <script type="text/javascript">
-   	      	function changeDispRes(el) {
-   				window["by" + el.options[el.selectedIndex].value]();
-			}
-   	    </script>
-   	    <select size="1" name="dataSelect" id="dataSelect" onchange="changeDispData(this);">
-			<option value="Ship" SELECTED>Ship</option>
-			<option value="ShipT">Ship Target</option>
-			<option value="ShipLY">LY Ship</option>
-			<option value="Sales" >Sales</option>
-			<option value="SalesT">Sales Target</option>
-			<option value="SalesLY">LY Sales</option>
-		</select>   
-   	    <script type="text/javascript">
-   	      	function changeDispData(el) {
-   				window["show" + el.options[el.selectedIndex].value]();
-			}
-   	    </script>     
-   	</div>
+    <header>
+        <!--h1 href="https://www.youtube.com/">Map (of the problematique)</h1-->
+        <h1><a href="https://www.youtube.com/watch?v=T1qzYsESDhc" target="_blank">Map (of the problematique)</a></h1>
+    </header>
     
-    <form align="center" id="brandsForm" action="">
+    <nav>
+        
+        <label>Group data by</label> <br>
+        <ul>
+            <li>
+                <select size="1" name="regSelect" id="regSelect" onchange="changeDispRes(this);">
+                    <option value="Region" SELECTED>Region</option>
+                    <option value="Market">Market</option>
+                    <option value="RepMarket">Reporting Market</option>
+                </select>
+   	            <script type="text/javascript">
+                    function changeDispRes(el) {
+                        window["by" + el.options[el.selectedIndex].value]();
+                    }
+   	            </script>
+   	        </li>
+        </ul>
+        
+        <br>
+        
+        <label>Data</label> <br>
+        <ul>
+            <li>
+                <select size="1" name="dataSelect" id="dataSelect" onchange="changeDispData(this);">
+                    <option value="Ship" SELECTED>Ship</option>
+                    <option value="ShipT">Ship Target</option>
+                    <option value="ShipLY">LY Ship</option>
+                    <option value="Sales" >Sales</option>
+                    <option value="SalesT">Sales Target</option>
+                    <option value="SalesLY">LY Sales</option>
+                </select>   
+                <script type="text/javascript">
+                    function changeDispData(el) {
+                        window["show" + el.options[el.selectedIndex].value]();
+                    }
+                </script>
+            </li>
+        </ul>
+        
+        <br>
+        
+        <label>Map focus</label> <br>
+        <ul>
+            <li>
+                <select size="1" name="mapFocus" id="mapFocus" onchange="changeMapFocus(this);">
+                    <option value="world" SELECTED>WORLD</option>
+                    <option value="150">Europe</option>
+                    <option value="019">Americas</option>
+                    <option value="142" >Asia</option>
+                    <option value="009">Oceania</option>
+                    <option value="002">Africa</option>
+                </select>   
+                <script type="text/javascript">
+                    function changeMapFocus(el) {
+                        window["mapFocus"](el.options[el.selectedIndex].value);
+                    }
+                </script>
+            </li>
+        </ul>
+        
+        <br>
+        
         <label>Select brands</label> <br>
-        <!--input type="checkbox" name="brand" value="A" checked onclick="changeBrandData(this);">A<br>
-        <input type="checkbox" name="brand" value="B" checked onclick="changeBrandData(this);">B<br>
-        <input type="checkbox" name="brand" value="C" checked onclick="changeBrandData(this);">C<br-->
-    </form>
-    <script type="text/javascript">
-   	  	function changeBrandData(el) {
-   			window["filterBrand"](el);
-		}
-   	</script>
+        <ul>
+            <li>
+                <form id="brandsForm" action="">
+                    <!--input type="checkbox" name="brand" value="A" checked onclick="changeBrandData(this);">A<br>
+                    <input type="checkbox" name="brand" value="B" checked onclick="changeBrandData(this);">B<br>
+                    <input type="checkbox" name="brand" value="C" checked onclick="changeBrandData(this);">C<br-->
+                </form>
+                <script type="text/javascript">
+                    function changeBrandData(el) {
+                        window["filterBrand"](el);
+                    }
+                </script>
+            </li>
+        </ul>
+
+    </nav>
     
-   	<div id="regions_div" style="width: 80%; margin:0 auto;" ></div>
+    <article>
+        <div>
+            <div id="regions_div" style="width:95%; margin:0 auto; padding: 10px; background-color: #795548;" ></div>
+        </div>
+
+        <br>
+
+        <div align="center">
+            <table class="columns">
+                <tr>
+                    <td>
+                        <div id="chart1_div"></div>
+                    </td>
+                    <td>
+                        <div id="chart2_div"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div id="chart3_div"></div>
+                    </td>
+                    <td>
+                        <div id="chart4_div"></div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="table_div" style="padding-top: 30px" align="center"></div>
+    </article>
     
-   	<br>
-    
-   	<div align="center">
-   		<table class="columns">
-   			<tr>
-   				<td>
-   					<div id="chart1_div"></div>
-   				</td>
-   				<td>
-   					<div id="chart2_div"></div>
-   				</td>
-   			</tr>
-   			<tr>
-   				<td>
-   					<div id="chart3_div"></div>
-   				</td>
-   				<td>
-   					<div id="chart4_div"></div>
-   				</td>
-   			</tr>
-   		</table>
-   	</div>
-   	<div id="table_div" style="padding-top: 30px" align="center"></div>
+    <footer>Carlo Delle Donne, Lazaros Lazaridis, Dimitris Patoukas, Sergio Soto (alphabetically sorted :P)</footer>
+
 </div>
 </body>
 </html>
