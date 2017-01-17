@@ -446,28 +446,28 @@ On top of that, we would like to have slicers next to the map with brands. In th
        					{'column': 6, 'aggregation': google.visualization.data.sum, 'type': 'number'}
        				]
        			);
-       			chart1.draw(chart1Data, {title: 'Ship vs Target', vAxis: {minValue: 0, title: 'Whatever'}, animation:{startup: true, duration: 1000, easing: 'out'}});
+       			chart1.draw(chart1Data, {title: 'Shipments vs Target', vAxis: {minValue: 0}, animation:{startup: true, duration: 1000, easing: 'out'}, legend:{position: 'none'}});
        			
                 chart2Data = google.visualization.data.group(dataView, [areaDisplayed], 
        				[	{'column': 5, 'aggregation': google.visualization.data.sum, 'type': 'number'},
        					{'column': 7, 'aggregation': google.visualization.data.sum, 'type': 'number'}
        				]
        			);
-       			chart2.draw(chart2Data, {title: 'Ship vs Ship LY', vAxis: {minValue: 0, title: 'Whatever'}, animation:{startup: true, duration: 1000, easing: 'out'}});
+       			chart2.draw(chart2Data, {title: 'Shipments vs Last Year\'s', vAxis: {minValue: 0}, animation:{startup: true, duration: 1000, easing: 'out'}, legend:{position: 'none'}});
        			
                 chart3Data = google.visualization.data.group(dataView, [areaDisplayed], 
        				[	{'column': 8, 'aggregation': google.visualization.data.sum, 'type': 'number'},
        					{'column': 9, 'aggregation': google.visualization.data.sum, 'type': 'number'}
        				]
        			);
-       			chart3.draw(chart3Data, {title: 'Sales vs Target', vAxis: {minValue: 0, title: 'Whatever'}, animation:{startup: true, duration: 1000, easing: 'out'}});
+       			chart3.draw(chart3Data, {title: 'Sales vs Target', vAxis: {minValue: 0}, animation:{startup: true, duration: 1000, easing: 'out'}, legend:{position: 'none'}});
        			
                 chart4Data = google.visualization.data.group(dataView, [areaDisplayed], 
        				[	{'column': 8, 'aggregation': google.visualization.data.sum, 'type': 'number'},
        					{'column': 10, 'aggregation': google.visualization.data.sum, 'type': 'number'}
        				]
        			);
-       			chart4.draw(chart4Data, {title: 'Sales vs Sales LY', vAxis: {minValue: 0, title: 'Whatever'}, animation:{startup: true, duration: 1000, easing: 'out'}});
+       			chart4.draw(chart4Data, {title: 'Sales vs Last Year\'s', vAxis: {minValue: 0}, animation:{startup: true, duration: 1000, easing: 'out'}, legend:{position: 'none'}});
    			}
    			// Add callback to click on map event
    			google.visualization.events.addListener(map, 'select', clickHandler);
@@ -506,12 +506,12 @@ On top of that, we would like to have slicers next to the map with brands. In th
         <ul>
             <li>
                 <select size="1" name="dataSelect" id="dataSelect" onchange="changeDispData(this);">
-                    <option value="Ship" SELECTED>Ship</option>
-                    <option value="ShipT">Ship Target</option>
-                    <option value="ShipLY">LY Ship</option>
+                    <option value="Ship" SELECTED>Shipments</option>
+                    <option value="ShipT">Target Shipments</option>
+                    <option value="ShipLY">Last Year's Shipments</option>
                     <option value="Sales" >Sales</option>
-                    <option value="SalesT">Sales Target</option>
-                    <option value="SalesLY">LY Sales</option>
+                    <option value="SalesT">Target Sales</option>
+                    <option value="SalesLY">Last Year's Sales</option>
                 </select>   
                 <script type="text/javascript">
                     function changeDispData(el) {
@@ -523,12 +523,12 @@ On top of that, we would like to have slicers next to the map with brands. In th
         
         <br>
         
-        <label>Year</label> <br>
+        <label>Interval</label> <br>
         <ul>
             <li>
-                <select size="1" name="yearSelect" id="yearSelect" onchange="changeYear(this);">
-                    <option value="This" SELECTED>This</option>
-                    <option value="Last">Last</option>
+                <select size="1" name="timeSelect" id="timeSelect" onchange="changeTime(this);">
+                    <option value="year" SELECTED>Year</option>
+                    <option value="month">Month</option>
                 </select>   
                 <script type="text/javascript">
                     function changeYear(el) {
