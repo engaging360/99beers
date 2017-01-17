@@ -21,7 +21,7 @@ On top of that, we would like to have slicers next to the map with brands. In th
 
         header {
             padding: 0em;
-            margin-bottom: 1em;
+            margin-bottom: 0em;
             color: #607D8B;
             background-color: #F5F5F5;
             border-bottom-width: thin;
@@ -32,17 +32,21 @@ On top of that, we would like to have slicers next to the map with brands. In th
         }
         
         footer {
-            padding: 0.5em;
-            padding-left: 30px;
+            padding: 1em;
+            margin-left: 30px;
+            margin-right: 30px;
             margin-top: 2em;
             color: #607D8B;
-            background-color: #F5F5F5;
+            background-color: white;
             border-bottom-width: thin;
             border-bottom-color: #BDBDBD;
             border-bottom-style:inset;
             clear: left;
-            text-align: left;
+            text-align: center;
             font-family: Courier New;
+            border-top-width: thin;
+            border-top-color: gainsboro;
+            border-top-style:inset;
         }
         
         h1 {
@@ -73,12 +77,15 @@ On top of that, we would like to have slicers next to the map with brands. In th
         nav {
             float: left;
             max-width: 160px;
+            height: 70%;
             margin-top: 1em;
             margin-left: 30px;
-            padding-right: 1em;
-            border-right-width: medium;
-            border-right-color: #ECEFF1;
-            border-right-style: solid;
+            padding: 1em;
+            border-width: medium;
+            border-color: #795548;
+            border-style: solid;
+            background-color: white;
+            overflow: scroll;
         }
 
         nav ul {
@@ -86,7 +93,6 @@ On top of that, we would like to have slicers next to the map with brands. In th
             padding: 0px;
             margin: 0em;
             margin-top: 0.2em;
-            max-height: 15em;
             overflow: scroll;
             background-color: white;
         }
@@ -103,16 +109,33 @@ On top of that, we would like to have slicers next to the map with brands. In th
     </style>
     
    	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="data-from-excel.js"></script>
    	<script type="text/javascript">
      	google.charts.load('upcoming', {'packages':['geochart', 'controls', 'table', 'corechart', 'bar']});
      	google.charts.setOnLoadCallback(drawRegionsMap);
      	function drawRegionsMap() {
+            
+            /**
+             *   COLUMNS MAPPING:
+             *   0   ->  region
+             *   1   ->  market
+             *   2   ->  repmarket   (reporting market)
+             *   3   ->  brand
+             *   4   ->  variant
+             *   5   ->  ship        (shimpents)
+             *   6   ->  shiptarg    (target shipments)
+             *   7   ->  shiply      (last year's shipments)
+             *   8   ->  sales       (sales)
+             *   9   ->  salestarg   (target sales)
+             *   10  ->  salesly     (last year's sales)
+             */
+            
      		// Dashboard where the graphs and controls are handled
      		var dashboard = new google.visualization.Dashboard(document.getElementById('dashboard_div'));
      		// DataTable with the raw data from Excel
        		var data = new google.visualization.DataTable();
        		// Default column to display = 3 (Shipments)
-       		var colDisplayed = 3;
+       		var colDisplayed = 5;
        		// Default resolution displayed = continents
        		var resDisplayed = 'continents';
        		// Default name column (continents = 0, subcontinents = 1 or countries = 2). Changes along with resDisplayed
@@ -142,56 +165,68 @@ On top of that, we would like to have slicers next to the map with brands. In th
        		var chart3 = new google.visualization.ColumnChart(document.getElementById('chart3_div'));
        		var chart4 = new google.visualization.ColumnChart(document.getElementById('chart4_div'));
             
-            var brandsArray = [
-                //{brand: 'A', checked: true},
-                //{brand: 'B', checked: true},
-                //{brand: 'F', checked: true}
-            ];
+            var brandsArray = [];
 
             var dataView, dataViewAggr;
 
        		// Initializing the data array. This part of the code will be substituted by automatic generation in VBA from the Excel macro.
-       		data.addColumn('string', 'Region');
-       		data.addColumn('string', 'Market');
-       		data.addColumn('string', 'Reporting Market');
-       		data.addColumn('number', 'Ship');
-       		data.addColumn('number', 'Ship Target');
-       		data.addColumn('number', 'LY Ship');
-       		data.addColumn('number', 'Sales');
-       		data.addColumn('number', 'Sales Target');
-       		data.addColumn('number', 'LY Sales');
-       		data.addColumn('string', 'Brand');
-       		data.addRows([
-        		['002', '014', 'Tanzania',        6453, 2000, 3456, 6485, 7456, 3003, 'A'],
-        		['002', '011', 'Nigeria',         6433, 2854, 6543, 2004, 4556, 3003, 'B'],
-        		['002', '015', 'Ghana',           8353, 8546, 4567, 3544, 2400, 3452, 'A'],
-        		['150', '154', 'Denmark',         2443, 2000, 7654, 3445, 7554, 3003, 'C'],
-        		['150', '154', 'Estonia',         9453, 2454, 5678, 7534, 2400, 6432, 'B'],
-        		['150', '155', 'Austria',         2276, 1854, 9876, 2020, 6645, 6453, 'A'],
-        		['150', '039', 'Greece',          6574, 5648, 6789, 5344, 3345, 3004, 'C'],
-        		['150', '151', 'Russia',          9553, 7453, 3456, 7455, 2600, 5433, 'C'],
-        		['019', '021', 'United States',   8644, 7354, 6543, 7554, 2700, 2334, 'A'],
-        		['019', '021', 'Canada',          1363, 7548, 2345, 2355, 7445, 3040, 'B'],
-        		['019', '013', 'Mexico',          3647, 2734, 5432, 1253, 2070, 8526, 'D'],
-        		['019', '013', 'Mexico',          2454, 3485, 3456, 6443, 2040, 3030, 'A'],
-        		['019', '013', 'Mexico',          5323, 2000, 2345, 2336, 7554, 3254, 'C'],
-        		['019', '029', 'Cuba',            2453, 5965, 6234, 7524, 6435, 4543, 'A'],
-        		['019', '013', 'Belize',          2754, 5679, 7345, 8576, 6345, 2334, 'C'],
-        		['019', '005', 'Bolivia',         8434, 5067, 4576, 3545, 6243, 7425, 'B'],
-        		['142', '143', 'Turkemistan',     7443, 5646, 8245, 7445, 2300, 3345, 'B'],
-        		['142', '030', 'China',           2753, 5685, 8345, 8556, 2040, 4556, 'A'],
-        		['142', '030', 'Mongolia',        2846, 1234, 7453, 3445, 4344, 5657, 'C'],
-        		['142', '034', 'Afghanistan',     7344, 2345, 4573, 3456, 5355, 6578, 'C'],
-        		['142', '034', 'India',           4577, 3456, 7345, 7435, 2020, 7859, 'B'],
-        		['142', '035', 'Indonesia',       8565, 4567, 3000, 2500, 3345, 8940, 'B'],
-        		['142', '145', 'Armenia',         3455, 5678, 7543, 8745, 6334, 6543, 'B'],
-        		['009', '053', 'Australia',       2856, 6789, 7458, 9746, 6433, 5433, 'C'],
-        		['009', '053', 'New Zealand',     8456, 7890, 4586, 7356, 6366, 6354, 'A'],
-        		['009', '054', 'Fiji',            2574, 7654, 9657, 4546, 7737, 7365, 'A'],
-       		]);
+            
+            var i = 0;
+            for (var key in importedData[0]) {
+                if (i<5)
+                    data.addColumn('string', key);
+                else
+                    data.addColumn('number', key);
+                i++;
+            }
+            
+//       		data.addColumn('string', 'Region');
+//       		data.addColumn('string', 'Market');
+//       		data.addColumn('string', 'Reporting Market');
+//       		data.addColumn('number', 'Ship');
+//       		data.addColumn('number', 'Ship Target');
+//       		data.addColumn('number', 'LY Ship');
+//       		data.addColumn('number', 'Sales');
+//       		data.addColumn('number', 'Sales Target');
+//       		data.addColumn('number', 'LY Sales');
+//       		data.addColumn('string', 'Brand');
+//       		data.addRows([
+//        		['002', '014', 'Tanzania',        6453, 2000, 3456, 6485, 7456, 3003, 'A'],
+//        		['002', '011', 'Nigeria',         6433, 2854, 6543, 2004, 4556, 3003, 'B'],
+//        		['002', '015', 'Ghana',           8353, 8546, 4567, 3544, 2400, 3452, 'A'],
+//        		['150', '154', 'Denmark',         2443, 2000, 7654, 3445, 7554, 3003, 'C'],
+//        		['150', '154', 'Estonia',         9453, 2454, 5678, 7534, 2400, 6432, 'B'],
+//        		['150', '155', 'Austria',         2276, 1854, 9876, 2020, 6645, 6453, 'A'],
+//        		['150', '039', 'Greece',          6574, 5648, 6789, 5344, 3345, 3004, 'C'],
+//        		['150', '151', 'Russia',          9553, 7453, 3456, 7455, 2600, 5433, 'C'],
+//        		['019', '021', 'United States',   8644, 7354, 6543, 7554, 2700, 2334, 'A'],
+//        		['019', '021', 'Canada',          1363, 7548, 2345, 2355, 7445, 3040, 'B'],
+//        		['019', '013', 'Mexico',          3647, 2734, 5432, 1253, 2070, 8526, 'D'],
+//        		['019', '013', 'Mexico',          2454, 3485, 3456, 6443, 2040, 3030, 'A'],
+//        		['019', '013', 'Mexico',          5323, 2000, 2345, 2336, 7554, 3254, 'C'],
+//        		['019', '029', 'Cuba',            2453, 5965, 6234, 7524, 6435, 4543, 'A'],
+//        		['019', '013', 'Belize',          2754, 5679, 7345, 8576, 6345, 2334, 'C'],
+//        		['019', '005', 'Bolivia',         8434, 5067, 4576, 3545, 6243, 7425, 'B'],
+//        		['142', '143', 'Turkemistan',     7443, 5646, 8245, 7445, 2300, 3345, 'B'],
+//        		['142', '030', 'China',           2753, 5685, 8345, 8556, 2040, 4556, 'A'],
+//        		['142', '030', 'Mongolia',        2846, 1234, 7453, 3445, 4344, 5657, 'C'],
+//        		['142', '034', 'Afghanistan',     7344, 2345, 4573, 3456, 5355, 6578, 'C'],
+//        		['142', '034', 'India',           4577, 3456, 7345, 7435, 2020, 7859, 'B'],
+//        		['142', '035', 'Indonesia',       8565, 4567, 3000, 2500, 3345, 8940, 'B'],
+//        		['142', '145', 'Armenia',         3455, 5678, 7543, 8745, 6334, 6543, 'B'],
+//        		['009', '053', 'Australia',       2856, 6789, 7458, 9746, 6433, 5433, 'C'],
+//        		['009', '053', 'New Zealand',     8456, 7890, 4586, 7356, 6366, 6354, 'A'],
+//        		['009', '054', 'Fiji',            2574, 7654, 9657, 4546, 7737, 7365, 'A'],
+//       		]);
+            
+            for (var k=0; k<importedData.length; k++) {
+                var newRow = [];
+                for (var key in importedData[k])
+                    newRow.push(importedData[k][key]);
+                data.addRow(newRow);
+            }
 
 			// Populate table data into a DataView (not a DataTable!!)
-			tableData = new google.visualization.DataView(data);
             dataView = new google.visualization.DataView(data);
             
             // Add checkboxes based on the set of brands found in the table
@@ -231,28 +266,62 @@ On top of that, we would like to have slicers next to the map with brands. In th
 */
             
             // Function to add checkboxes based on the set of brands found in the table
+//            function addCheckbox() {
+//                var form = document.getElementById('brandsForm');
+//                
+//                for (var i=0; i<data.getNumberOfRows(); i++) {
+//                    for (var j=0; j<brandsArray.length; j++) {
+//                        if (data.getValue(i, 3) == brandsArray[j].brand)
+//                            break;
+//                    }
+//                    if (j == brandsArray.length) {
+//                        var cb = document.createElement('input');
+//                        cb.type = 'checkbox';
+//                        cb.name = 'brand';
+//                        cb.value = data.getValue(i, 3);
+//                        cb.setAttribute("onclick","javascript:filterBrand(this);");
+//                        cb.checked = true;
+//
+//                        form.appendChild(cb);
+//                        form.appendChild(document.createTextNode(data.getValue(i, 3)));
+//                        form.appendChild(document.createElement('br'));
+//
+//                        brandsArray.push({brand: data.getValue(i, 3), checked: 'true'});
+//                    }
+//                }
+//            }
+            
             function addCheckbox() {
                 var form = document.getElementById('brandsForm');
                 
                 for (var i=0; i<data.getNumberOfRows(); i++) {
                     for (var j=0; j<brandsArray.length; j++) {
-                        if (data.getValue(i, 9) == brandsArray[j].brand)
+                        if (data.getValue(i, 3) == brandsArray[j].brand)
                             break;
                     }
-                    if (j == brandsArray.length) {
-                        var cb = document.createElement('input');
-                        cb.type = 'checkbox';
-                        cb.name = 'brand';
-                        cb.value = data.getValue(i, 9);
-                        cb.setAttribute("onclick","javascript:filterBrand(this);");
-                        cb.checked = true;
+                    if (j == brandsArray.length)
+                        brandsArray.push({brand: data.getValue(i, 3), checked: 'true'});
+                }
+                
+                brandsArray.sort(function(a, b){
+                    var x = a.brand.toLowerCase();
+                    var y = b.brand.toLowerCase();
+                    if (x < y) {return -1;}
+                    if (x > y) {return 1;}
+                    return 0;
+                });
+                
+                for (var i=0; i<brandsArray.length; i++) {
+                    var cb = document.createElement('input');
+                    cb.type = 'checkbox';
+                    cb.name = 'brand';
+                    cb.value = brandsArray[i]['brand'];
+                    cb.setAttribute("onclick","javascript:filterBrand(this);");
+                    cb.checked = true;
 
-                        form.appendChild(cb);
-                        form.appendChild(document.createTextNode(data.getValue(i, 9)));
-                        form.appendChild(document.createElement('br'));
-
-                        brandsArray.push({brand: data.getValue(i, 9), checked: 'true'});
-                    }
+                    form.appendChild(cb);
+                    form.appendChild(document.createTextNode(cb.value));
+                    form.appendChild(document.createElement('br'));   
                 }
             }
             
@@ -262,7 +331,7 @@ On top of that, we would like to have slicers next to the map with brands. In th
                 
                 
                 dataView.setRows(data.getFilteredRows([{
-                    column: 9, 
+                    column: 3, 
                     test: function (value, row, column, table) {
                         var res = false;
                         for (var i=0; i<brandsArray.length; i++) {
@@ -318,27 +387,27 @@ On top of that, we would like to have slicers next to the map with brands. In th
 
       		// Functions to change the data column chosen to display in map
       		showShip = function(){
-				colDisplayed = 3;
-      		  	redrawMap();
-      		}
-      		showShipT = function(){
-				colDisplayed = 4;
-      		  	redrawMap();
-      		}
-      		showShipLY = function(){
 				colDisplayed = 5;
       		  	redrawMap();
       		}
-			showSales = function(){
+      		showShipT = function(){
 				colDisplayed = 6;
       		  	redrawMap();
       		}
-      		showSalesT = function(){
+      		showShipLY = function(){
 				colDisplayed = 7;
       		  	redrawMap();
       		}
-      		showSalesLY = function(){
+			showSales = function(){
 				colDisplayed = 8;
+      		  	redrawMap();
+      		}
+      		showSalesT = function(){
+				colDisplayed = 9;
+      		  	redrawMap();
+      		}
+      		showSalesLY = function(){
+				colDisplayed = 10;
       		  	redrawMap();
       		}
             
@@ -355,7 +424,7 @@ On top of that, we would like to have slicers next to the map with brands. In th
 				//tableData.setRows(data.getFilteredRows([{column: areaDisplayed, value: region}]))
 
                 dataView.setRows(data.getFilteredRows([{
-                    column: 9, 
+                    column: 3, 
                     test: function (value, row, column, table) {
                         var res = false;
                         for (var i=0; i<brandsArray.length; i++) {
@@ -373,29 +442,29 @@ On top of that, we would like to have slicers next to the map with brands. In th
        			table.draw(dataView, {showRowNumber: true});
        			
                 chart1Data = google.visualization.data.group(dataView, [areaDisplayed], 
-       				[	{'column': 3, 'aggregation': google.visualization.data.sum, 'type': 'number'},
-       					{'column': 4, 'aggregation': google.visualization.data.sum, 'type': 'number'}
+       				[	{'column': 5, 'aggregation': google.visualization.data.sum, 'type': 'number'},
+       					{'column': 6, 'aggregation': google.visualization.data.sum, 'type': 'number'}
        				]
        			);
        			chart1.draw(chart1Data, {title: 'Ship vs Target', vAxis: {minValue: 0, title: 'Whatever'}, animation:{startup: true, duration: 1000, easing: 'out'}});
        			
                 chart2Data = google.visualization.data.group(dataView, [areaDisplayed], 
-       				[	{'column': 3, 'aggregation': google.visualization.data.sum, 'type': 'number'},
-       					{'column': 5, 'aggregation': google.visualization.data.sum, 'type': 'number'}
+       				[	{'column': 5, 'aggregation': google.visualization.data.sum, 'type': 'number'},
+       					{'column': 7, 'aggregation': google.visualization.data.sum, 'type': 'number'}
        				]
        			);
        			chart2.draw(chart2Data, {title: 'Ship vs Ship LY', vAxis: {minValue: 0, title: 'Whatever'}, animation:{startup: true, duration: 1000, easing: 'out'}});
        			
                 chart3Data = google.visualization.data.group(dataView, [areaDisplayed], 
-       				[	{'column': 6, 'aggregation': google.visualization.data.sum, 'type': 'number'},
-       					{'column': 7, 'aggregation': google.visualization.data.sum, 'type': 'number'}
+       				[	{'column': 8, 'aggregation': google.visualization.data.sum, 'type': 'number'},
+       					{'column': 9, 'aggregation': google.visualization.data.sum, 'type': 'number'}
        				]
        			);
        			chart3.draw(chart3Data, {title: 'Sales vs Target', vAxis: {minValue: 0, title: 'Whatever'}, animation:{startup: true, duration: 1000, easing: 'out'}});
        			
                 chart4Data = google.visualization.data.group(dataView, [areaDisplayed], 
-       				[	{'column': 6, 'aggregation': google.visualization.data.sum, 'type': 'number'},
-       					{'column': 8, 'aggregation': google.visualization.data.sum, 'type': 'number'}
+       				[	{'column': 8, 'aggregation': google.visualization.data.sum, 'type': 'number'},
+       					{'column': 10, 'aggregation': google.visualization.data.sum, 'type': 'number'}
        				]
        			);
        			chart4.draw(chart4Data, {title: 'Sales vs Sales LY', vAxis: {minValue: 0, title: 'Whatever'}, animation:{startup: true, duration: 1000, easing: 'out'}});
@@ -447,6 +516,23 @@ On top of that, we would like to have slicers next to the map with brands. In th
                 <script type="text/javascript">
                     function changeDispData(el) {
                         window["show" + el.options[el.selectedIndex].value]();
+                    }
+                </script>
+            </li>
+        </ul>
+        
+        <br>
+        
+        <label>Year</label> <br>
+        <ul>
+            <li>
+                <select size="1" name="yearSelect" id="yearSelect" onchange="changeYear(this);">
+                    <option value="This" SELECTED>This</option>
+                    <option value="Last">Last</option>
+                </select>   
+                <script type="text/javascript">
+                    function changeYear(el) {
+//                        window["show" + el.options[el.selectedIndex].value]();
                     }
                 </script>
             </li>
@@ -523,7 +609,7 @@ On top of that, we would like to have slicers next to the map with brands. In th
         <div id="table_div" style="padding-top: 30px" align="center"></div>
     </article>
     
-    <footer>Carlo Delle Donne, Lazaros Lazaridis, Dimitris Patoukas, Sergio Soto (alphabetically sorted :P)</footer>
+    <footer>Carlo Delle Donne, Lazaros Lazaridis, Dimitris Patoukas, Sergio Soto @ TU Delft</footer>
 
 </div>
 </body>
