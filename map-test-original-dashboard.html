@@ -117,17 +117,37 @@ On top of that, we would like to have slicers next to the map with brands. In th
             
             /**
              *   COLUMNS MAPPING:
-             *   0   ->  region
-             *   1   ->  market
-             *   2   ->  repmarket   (reporting market)
-             *   3   ->  brand
-             *   4   ->  variant
-             *   5   ->  ship        (shimpents)
-             *   6   ->  shiptarg    (target shipments)
-             *   7   ->  shiply      (last year's shipments)
-             *   8   ->  sales       (sales)
-             *   9   ->  salestarg   (target sales)
-             *   10  ->  salesly     (last year's sales)
+             *
+             *   0   ->  Region             30  ->  Ship target M12     60  ->  Sales target M3
+             *   1   ->  Market             31  ->  Target Shipments    61  ->  Sales target M4
+             *   2   ->  Rep. Market        32  ->  LY Ship M1          62  ->  Sales target M5
+             *   3   ->  Brand              33  ->  LY Ship M2          63  ->  Sales target M6
+             *   4   ->  Variant            34  ->  LY Ship M3          64  ->  Sales target M7
+             *   5   ->  Ship M1            35  ->  LY Ship M4          65  ->  Sales target M8
+             *   6   ->  Ship M2            36  ->  LY Ship M5          66  ->  Sales target M9
+             *   7   ->  Ship M3            37  ->  LY Ship M6          67  ->  Sales target M10
+             *   8   ->  Ship M4            38  ->  LY Ship M7          68  ->  Sales target M11
+             *   9   ->  Ship M5            39  ->  LY Ship M8          69  ->  Sales target M12
+             *   10  ->  Ship M6            40  ->  LY Ship M9          70  ->  Target Sales
+             *   11  ->  Ship M7            41  ->  LY Ship M10         71  ->  LY Sales M1
+             *   12  ->  Ship M8            42  ->  LY Ship M11         72  ->  LY Sales M2
+             *   13  ->  Ship M9            43  ->  LY Ship M12         73  ->  LY Sales M3
+             *   14  ->  Ship M10           44  ->  Last Year Shipments 74  ->  LY Sales M4
+             *   15  ->  Ship M11           45  ->  Sales M1            75  ->  LY Sales M5
+             *   16  ->  Ship M12           46  ->  Sales M2            76  ->  LY Sales M6
+             *   17  ->  Shipments          47  ->  Sales M3            77  ->  LY Sales M7
+             *   18  ->  Ship target M1     48  ->  Sales M4            78  ->  LY Sales M8
+             *   19  ->  Ship target M1     49  ->  Sales M5            79  ->  LY Sales M9
+             *   10  ->  Ship target M2     50  ->  Sales M6            80  ->  LY Sales M10
+             *   21  ->  Ship target M3     51  ->  Sales M7            81  ->  LY Sales M11
+             *   22  ->  Ship target M4     52  ->  Sales M8            82  ->  LY Sales M12
+             *   23  ->  Ship target M5     53  ->  Sales M9            83  ->  Last Year Sales
+             *   24  ->  Ship target M6     54  ->  Sales M10
+             *   25  ->  Ship target M7     55  ->  Sales M11
+             *   26  ->  Ship target M8     56  ->  Sales M12
+             *   27  ->  Ship target M9     57  ->  Sales
+             *   28  ->  Ship target M10    58  ->  Sales target M1
+             *   29  ->  Ship target M11    59  ->  Sales target M2
              */
             
      		// Dashboard where the graphs and controls are handled
