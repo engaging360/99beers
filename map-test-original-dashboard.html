@@ -109,7 +109,8 @@ On top of that, we would like to have slicers next to the map with brands. In th
     </style>
     
    	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript" src="data-from-excel.js"></script>
+    <!--script type="text/javascript" src="data-from-excel.js"></script-->
+    <script type="text/javascript" src="data-from-excel-whole.js"></script>
    	<script type="text/javascript">
      	google.charts.load('upcoming', {'packages':['geochart', 'controls', 'table', 'corechart', 'bar']});
      	google.charts.setOnLoadCallback(drawRegionsMap);
@@ -118,44 +119,44 @@ On top of that, we would like to have slicers next to the map with brands. In th
             /**
              *   COLUMNS MAPPING:
              *
-             *   0   ->  Region             30  ->  Ship target M12     60  ->  Sales target M3
-             *   1   ->  Market             31  ->  Target Shipments    61  ->  Sales target M4
-             *   2   ->  Rep. Market        32  ->  LY Ship M1          62  ->  Sales target M5
-             *   3   ->  Brand              33  ->  LY Ship M2          63  ->  Sales target M6
-             *   4   ->  Variant            34  ->  LY Ship M3          64  ->  Sales target M7
-             *   5   ->  Ship M1            35  ->  LY Ship M4          65  ->  Sales target M8
-             *   6   ->  Ship M2            36  ->  LY Ship M5          66  ->  Sales target M9
-             *   7   ->  Ship M3            37  ->  LY Ship M6          67  ->  Sales target M10
-             *   8   ->  Ship M4            38  ->  LY Ship M7          68  ->  Sales target M11
-             *   9   ->  Ship M5            39  ->  LY Ship M8          69  ->  Sales target M12
-             *   10  ->  Ship M6            40  ->  LY Ship M9          70  ->  Target Sales
-             *   11  ->  Ship M7            41  ->  LY Ship M10         71  ->  LY Sales M1
-             *   12  ->  Ship M8            42  ->  LY Ship M11         72  ->  LY Sales M2
-             *   13  ->  Ship M9            43  ->  LY Ship M12         73  ->  LY Sales M3
-             *   14  ->  Ship M10           44  ->  Last Year Shipments 74  ->  LY Sales M4
-             *   15  ->  Ship M11           45  ->  Sales M1            75  ->  LY Sales M5
-             *   16  ->  Ship M12           46  ->  Sales M2            76  ->  LY Sales M6
-             *   17  ->  Shipments          47  ->  Sales M3            77  ->  LY Sales M7
-             *   18  ->  Ship target M1     48  ->  Sales M4            78  ->  LY Sales M8
-             *   19  ->  Ship target M1     49  ->  Sales M5            79  ->  LY Sales M9
-             *   10  ->  Ship target M2     50  ->  Sales M6            80  ->  LY Sales M10
-             *   21  ->  Ship target M3     51  ->  Sales M7            81  ->  LY Sales M11
-             *   22  ->  Ship target M4     52  ->  Sales M8            82  ->  LY Sales M12
-             *   23  ->  Ship target M5     53  ->  Sales M9            83  ->  Last Year Sales
-             *   24  ->  Ship target M6     54  ->  Sales M10
-             *   25  ->  Ship target M7     55  ->  Sales M11
-             *   26  ->  Ship target M8     56  ->  Sales M12
-             *   27  ->  Ship target M9     57  ->  Sales
-             *   28  ->  Ship target M10    58  ->  Sales target M1
-             *   29  ->  Ship target M11    59  ->  Sales target M2
+             *   0   ->  Region             30  ->  Target Shipments    60  ->  Sales target M4
+             *   1   ->  Market             31  ->  LY Ship M1          61  ->  Sales target M5
+             *   2   ->  Rep. Market        32  ->  LY Ship M2          62  ->  Sales target M6
+             *   3   ->  Brand              33  ->  LY Ship M3          63  ->  Sales target M7
+             *   4   ->  Variant            34  ->  LY Ship M4          64  ->  Sales target M8
+             *   5   ->  Ship M1            35  ->  LY Ship M5          65  ->  Sales target M9
+             *   6   ->  Ship M2            36  ->  LY Ship M6          66  ->  Sales target M10
+             *   7   ->  Ship M3            37  ->  LY Ship M7          67  ->  Sales target M11
+             *   8   ->  Ship M4            38  ->  LY Ship M8          68  ->  Sales target M12
+             *   9   ->  Ship M5            39  ->  LY Ship M9          69  ->  Target Sales
+             *   10  ->  Ship M6            40  ->  LY Ship M10         70  ->  LY Sales M1
+             *   11  ->  Ship M7            41  ->  LY Ship M11         71  ->  LY Sales M2
+             *   12  ->  Ship M8            42  ->  LY Ship M12         72  ->  LY Sales M3
+             *   13  ->  Ship M9            43  ->  Last Year Shipments 73  ->  LY Sales M4
+             *   14  ->  Ship M10           44  ->  Sales M1            74  ->  LY Sales M5
+             *   15  ->  Ship M11           45  ->  Sales M2            75  ->  LY Sales M6
+             *   16  ->  Ship M12           46  ->  Sales M3            76  ->  LY Sales M7
+             *   17  ->  Shipments          47  ->  Sales M4            77  ->  LY Sales M8
+             *   18  ->  Ship target M1     48  ->  Sales M5            78  ->  LY Sales M9
+             *   19  ->  Ship target M2     49  ->  Sales M6            79  ->  LY Sales M10
+             *   10  ->  Ship target M3     50  ->  Sales M7            80  ->  LY Sales M11
+             *   21  ->  Ship target M4     51  ->  Sales M8            81  ->  LY Sales M12
+             *   22  ->  Ship target M5     52  ->  Sales M9            82  ->  Last Year Sales
+             *   23  ->  Ship target M6     53  ->  Sales M10
+             *   24  ->  Ship target M7     54  ->  Sales M11
+             *   25  ->  Ship target M8     55  ->  Sales M12
+             *   26  ->  Ship target M9     56  ->  Sales
+             *   27  ->  Ship target M10    57  ->  Sales target M1
+             *   28  ->  Ship target M11    58  ->  Sales target M2
+             *   29  ->  Ship target M12    59  ->  Sales target M3
              */
             
      		// Dashboard where the graphs and controls are handled
      		var dashboard = new google.visualization.Dashboard(document.getElementById('dashboard_div'));
      		// DataTable with the raw data from Excel
        		var data = new google.visualization.DataTable();
-       		// Default column to display = 3 (Shipments)
-       		var colDisplayed = 5;
+       		// Default column to display = 17 (Shipments)
+       		var colDisplayed = 17;
        		// Default resolution displayed = continents
        		var resDisplayed = 'continents';
        		// Default name column (continents = 0, subcontinents = 1 or countries = 2). Changes along with resDisplayed
@@ -189,8 +190,8 @@ On top of that, we would like to have slicers next to the map with brands. In th
 
             var dataView, dataViewAggr;
 
-       		// Initializing the data array. This part of the code will be substituted by automatic generation in VBA from the Excel macro.
-            
+
+            // Columns generation
             var i = 0;
             for (var key in importedData[0]) {
                 if (i<5)
@@ -407,27 +408,27 @@ On top of that, we would like to have slicers next to the map with brands. In th
 
       		// Functions to change the data column chosen to display in map
       		showShip = function(){
-				colDisplayed = 5;
+				colDisplayed = 17;
       		  	redrawMap();
       		}
       		showShipT = function(){
-				colDisplayed = 6;
+				colDisplayed = 30;
       		  	redrawMap();
       		}
       		showShipLY = function(){
-				colDisplayed = 7;
+				colDisplayed = 43;
       		  	redrawMap();
       		}
 			showSales = function(){
-				colDisplayed = 8;
+				colDisplayed = 56;
       		  	redrawMap();
       		}
       		showSalesT = function(){
-				colDisplayed = 9;
+				colDisplayed = 69;
       		  	redrawMap();
       		}
       		showSalesLY = function(){
-				colDisplayed = 10;
+				colDisplayed = 82;
       		  	redrawMap();
       		}
             
@@ -435,6 +436,13 @@ On top of that, we would like to have slicers next to the map with brands. In th
             mapFocus = function(value){
                 mapFoc = value;
                 redrawMap();
+            }
+            
+            function allColumns() {
+                var columns = [];
+                for (var k=0; k<=82; k++)
+                    columns.push(k);
+                return columns;
             }
 
 			// Callback function that handles clicks on the map regions
@@ -459,32 +467,36 @@ On top of that, we would like to have slicers next to the map with brands. In th
                     }
                 }]));
                 
-       			table.draw(dataView, {showRowNumber: true});
+                dataView.setColumns([0,1,2,3,4,17,30,43,56,69,82]);
+                
+       			table.draw(dataView, {width: '80%', frozenColumns: 5, showRowNumber: true, page: 'enable', pageSize: 20, pagingButtons: 'both'});
+                
+                dataView.setColumns(allColumns());
        			
                 chart1Data = google.visualization.data.group(dataView, [areaDisplayed], 
-       				[	{'column': 5, 'aggregation': google.visualization.data.sum, 'type': 'number'},
-       					{'column': 6, 'aggregation': google.visualization.data.sum, 'type': 'number'}
+       				[	{'column': 17, 'aggregation': google.visualization.data.sum, 'type': 'number'},
+       					{'column': 30, 'aggregation': google.visualization.data.sum, 'type': 'number'}
        				]
        			);
        			chart1.draw(chart1Data, {title: 'Shipments vs Target', vAxis: {minValue: 0}, animation:{startup: true, duration: 1000, easing: 'out'}, legend:{position: 'none'}});
        			
                 chart2Data = google.visualization.data.group(dataView, [areaDisplayed], 
-       				[	{'column': 5, 'aggregation': google.visualization.data.sum, 'type': 'number'},
-       					{'column': 7, 'aggregation': google.visualization.data.sum, 'type': 'number'}
+       				[	{'column': 17, 'aggregation': google.visualization.data.sum, 'type': 'number'},
+       					{'column': 43, 'aggregation': google.visualization.data.sum, 'type': 'number'}
        				]
        			);
        			chart2.draw(chart2Data, {title: 'Shipments vs Last Year\'s', vAxis: {minValue: 0}, animation:{startup: true, duration: 1000, easing: 'out'}, legend:{position: 'none'}});
        			
                 chart3Data = google.visualization.data.group(dataView, [areaDisplayed], 
-       				[	{'column': 8, 'aggregation': google.visualization.data.sum, 'type': 'number'},
-       					{'column': 9, 'aggregation': google.visualization.data.sum, 'type': 'number'}
+       				[	{'column': 56, 'aggregation': google.visualization.data.sum, 'type': 'number'},
+       					{'column': 69, 'aggregation': google.visualization.data.sum, 'type': 'number'}
        				]
        			);
        			chart3.draw(chart3Data, {title: 'Sales vs Target', vAxis: {minValue: 0}, animation:{startup: true, duration: 1000, easing: 'out'}, legend:{position: 'none'}});
        			
                 chart4Data = google.visualization.data.group(dataView, [areaDisplayed], 
-       				[	{'column': 8, 'aggregation': google.visualization.data.sum, 'type': 'number'},
-       					{'column': 10, 'aggregation': google.visualization.data.sum, 'type': 'number'}
+       				[	{'column': 56, 'aggregation': google.visualization.data.sum, 'type': 'number'},
+       					{'column': 82, 'aggregation': google.visualization.data.sum, 'type': 'number'}
        				]
        			);
        			chart4.draw(chart4Data, {title: 'Sales vs Last Year\'s', vAxis: {minValue: 0}, animation:{startup: true, duration: 1000, easing: 'out'}, legend:{position: 'none'}});
@@ -626,7 +638,7 @@ On top of that, we would like to have slicers next to the map with brands. In th
                 </tr>
             </table>
         </div>
-        <div id="table_div" style="padding-top: 30px" align="center"></div>
+        <div id="table_div" style="padding-left: 60px; padding-right: 60px; padding-top: 30px" align="center"></div>
     </article>
     
     <footer>Carlo Delle Donne, Lazaros Lazaridis, Dimitris Patoukas, Sergio Soto @ TU Delft</footer>
