@@ -106,6 +106,20 @@ On top of that, we would like to have slicers next to the map with brands. In th
             padding: 1em;
             overflow: hidden;
         }
+        
+        div.leftElement {
+            width: 45%;
+            float: left;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        
+        div.rightElement {
+            width: 45%;
+            float: right;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
     </style>
     
    	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -165,12 +179,14 @@ On top of that, we would like to have slicers next to the map with brands. In th
             var mapFoc = 'world';
        		// map options
        		var mapOptions;
+            // DataView linked to the DataTable 'data'
+            var dataView;
        		// Aggregated data used for the maps and bar charts. Elements are added from the DataView by using the areaDisplayed as index. e.g. 
        		// if continents is selected, rows with the same continent will be aggregated (added) into a single one, representing the figures 
        		// of all entries of that area
-       		var aggregated;
+            var dataViewAggr;
        		// Table filtered data, filtered whenever a region is clicked on the map
-       		var tableData;
+       		var tableView;
        		// Data formatted for the charts
        		var chart1Data;
        		var chart2Data;
@@ -187,9 +203,6 @@ On top of that, we would like to have slicers next to the map with brands. In th
        		var chart4 = new google.visualization.ColumnChart(document.getElementById('chart4_div'));
             
             var brandsArray = [];
-
-            var dataView, dataViewAggr;
-
 
             // Columns generation
             var i = 0;
@@ -444,13 +457,21 @@ On top of that, we would like to have slicers next to the map with brands. In th
                     columns.push(k);
                 return columns;
             }
+            
+            function getMinValue(chartData) {
+                var a = chartData.getValue(0,1);
+                var b = chartData.getValue(0,2);
+                var min = a;
+                if (b < min)
+                    min = b;
+                return (min-Math.abs(a-b)/8);
+            }
 
 			// Callback function that handles clicks on the map regions
    			function clickHandler(){
        			var selection = map.getSelection();
        			var region = dataViewAggr.getValue(selection[0].row, 0);
-				//tableData.setRows(data.getFilteredRows([{column: areaDisplayed, value: region}]))
-
+                
                 dataView.setRows(data.getFilteredRows([{
                     column: 3, 
                     test: function (value, row, column, table) {
@@ -467,39 +488,37 @@ On top of that, we would like to have slicers next to the map with brands. In th
                     }
                 }]));
                 
-                dataView.setColumns([0,1,2,3,4,17,30,43,56,69,82]);
-                
-       			table.draw(dataView, {width: '80%', frozenColumns: 5, showRowNumber: true, page: 'enable', pageSize: 20, pagingButtons: 'both'});
-                
-                dataView.setColumns(allColumns());
+                tableView = new google.visualization.DataView(dataView);
+                tableView.setColumns([0,1,2,3,4,17,30,43,56,69,82]);
+       			table.draw(tableView, {frozenColumns: 5, showRowNumber: true, page: 'enable', pageSize: 20, pagingButtons: 'both'});
        			
                 chart1Data = google.visualization.data.group(dataView, [areaDisplayed], 
        				[	{'column': 17, 'aggregation': google.visualization.data.sum, 'type': 'number'},
        					{'column': 30, 'aggregation': google.visualization.data.sum, 'type': 'number'}
        				]
        			);
-       			chart1.draw(chart1Data, {title: 'Shipments vs Target', vAxis: {minValue: 0}, animation:{startup: true, duration: 1000, easing: 'out'}, legend:{position: 'none'}});
+       			chart1.draw(chart1Data, {title: 'Shipments vs Target', vAxis: {minValue: getMinValue(chart1Data), format: '0.000E00'}, animation:{startup: true, duration: 1000, easing: 'out'}, legend:{position: 'none'}});
        			
                 chart2Data = google.visualization.data.group(dataView, [areaDisplayed], 
        				[	{'column': 17, 'aggregation': google.visualization.data.sum, 'type': 'number'},
        					{'column': 43, 'aggregation': google.visualization.data.sum, 'type': 'number'}
        				]
        			);
-       			chart2.draw(chart2Data, {title: 'Shipments vs Last Year\'s', vAxis: {minValue: 0}, animation:{startup: true, duration: 1000, easing: 'out'}, legend:{position: 'none'}});
+       			chart2.draw(chart2Data, {title: 'Shipments vs Last Year\'s', vAxis: {minValue: getMinValue(chart2Data), format: '0.000E00'}, animation:{startup: true, duration: 1000, easing: 'out'}, legend:{position: 'none'}});
        			
                 chart3Data = google.visualization.data.group(dataView, [areaDisplayed], 
        				[	{'column': 56, 'aggregation': google.visualization.data.sum, 'type': 'number'},
        					{'column': 69, 'aggregation': google.visualization.data.sum, 'type': 'number'}
        				]
        			);
-       			chart3.draw(chart3Data, {title: 'Sales vs Target', vAxis: {minValue: 0}, animation:{startup: true, duration: 1000, easing: 'out'}, legend:{position: 'none'}});
+       			chart3.draw(chart3Data, {title: 'Sales vs Target', vAxis: {minValue: getMinValue(chart3Data), format: '0.000E00'}, animation:{startup: true, duration: 1000, easing: 'out'}, legend:{position: 'none'}});
        			
                 chart4Data = google.visualization.data.group(dataView, [areaDisplayed], 
        				[	{'column': 56, 'aggregation': google.visualization.data.sum, 'type': 'number'},
        					{'column': 82, 'aggregation': google.visualization.data.sum, 'type': 'number'}
        				]
        			);
-       			chart4.draw(chart4Data, {title: 'Sales vs Last Year\'s', vAxis: {minValue: 0}, animation:{startup: true, duration: 1000, easing: 'out'}, legend:{position: 'none'}});
+       			chart4.draw(chart4Data, {title: 'Sales vs Last Year\'s', vAxis: {minValue: getMinValue(chart4Data), format: '0.000E00'}, animation:{startup: true, duration: 1000, easing: 'out'}, legend:{position: 'none'}});
    			}
    			// Add callback to click on map event
    			google.visualization.events.addListener(map, 'select', clickHandler);
@@ -617,27 +636,19 @@ On top of that, we would like to have slicers next to the map with brands. In th
         </div>
 
         <br>
-
-        <div align="center">
-            <table class="columns">
-                <tr>
-                    <td>
-                        <div id="chart1_div"></div>
-                    </td>
-                    <td>
-                        <div id="chart2_div"></div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div id="chart3_div"></div>
-                    </td>
-                    <td>
-                        <div id="chart4_div"></div>
-                    </td>
-                </tr>
-            </table>
+        
+        <div style="width:95%; margin:0 auto; padding: 10px;">
+            <div class="leftElement" id="chart1_div"></div>
+            <div class="rightElement" id="chart2_div"></div>
         </div>
+        
+        <br>
+        
+        <div style="width:95%; margin:0 auto; padding: 10px;">
+            <div class="leftElement" id="chart3_div"></div>
+            <div class="rightElement" id="chart4_div"></div>
+        </div>
+        
         <div id="table_div" style="padding-left: 60px; padding-right: 60px; padding-top: 30px" align="center"></div>
     </article>
     
