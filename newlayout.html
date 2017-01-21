@@ -369,7 +369,7 @@ On top of that, we would like to have slicers next to the map with brands. In th
 				mapOptions = {
                     region: mapFoc, 
                     resolution: resDisplayed,
-                    backgroundColor: {fill: '#81d4fa', stroke: '#000000', strokeWidth: 0},
+                    backgroundColor: {fill: '#81d4fa', stroke: '#607D8B', strokeWidth: 8},
                     colorAxis: {colors: ['#f4ee42', '#46ad13']},
                     enableRegionInteractivity: 'true',
                     tooltip: {showTitle: (resDisplayed == 'countries' ? true : false)}
@@ -493,7 +493,7 @@ On top of that, we would like to have slicers next to the map with brands. In th
                     chartTable.setValue(k, 2, chart1Data.getValue(0,k+13));
                 }
                 
-                chart1.draw(chartTable, {title : 'Shipments vs Target', vAxis : {minValue : getMinValue(chartTable)}, hAxis : {slandedText : true, slantedTextAngle : 50}, animation : {startup : true, duration : 1000, easing : 'out'}, legend : {position : 'none'}});
+                chart1.draw(chartTable, {colors : ['#1b5e20', '#26a69a'], title : 'Shipments vs Target', vAxis : {minValue : getMinValue(chartTable)}, hAxis : {slandedText : true, slantedTextAngle : 50}, animation : {startup : true, duration : 1000, easing : 'out'}, legend : {position : 'none'}});
 
                 /********************************************************************************/
                 // Chart 2 drawing
@@ -505,7 +505,7 @@ On top of that, we would like to have slicers next to the map with brands. In th
                 for (var k=0; k<12; k++)
                     chartTable.setValue(k, 2, chart2Data.getValue(0,k+13));
 
-                chart2.draw(chartTable, {title : 'Shipments vs Last Year\'s', vAxis : {minValue : getMinValue(chartTable)}, hAxis : {slandedText : true, slantedTextAngle : 50}, animation : {startup : true, duration : 1000, easing : 'out'}, legend : {position : 'none'}});
+                chart2.draw(chartTable, {colors : ['#1b5e20', '#26a69a'], title : 'Shipments vs Last Year\'s', vAxis : {minValue : getMinValue(chartTable)}, hAxis : {slandedText : true, slantedTextAngle : 50}, animation : {startup : true, duration : 1000, easing : 'out'}, legend : {position : 'none'}});
 
                 /********************************************************************************/
                 // Chart 3 drawing
@@ -522,7 +522,7 @@ On top of that, we would like to have slicers next to the map with brands. In th
                     chartTable.setValue(k, 2, chart3Data.getValue(0,k+13));
                 }
 
-                chart3.draw(chartTable, {title : 'Sales vs Target', vAxis : {minValue : getMinValue(chartTable)}, hAxis : {slandedText : true, slantedTextAngle : 50}, animation : {startup : true, duration : 1000, easing : 'out'}, legend : {position : 'none'}});
+                chart3.draw(chartTable, {colors : ['#1b5e20', '#26a69a'], title : 'Sales vs Target', vAxis : {minValue : getMinValue(chartTable)}, hAxis : {slandedText : true, slantedTextAngle : 50}, animation : {startup : true, duration : 1000, easing : 'out'}, legend : {position : 'none'}});
 
                 /********************************************************************************/
                 // Chart 4 drawing
@@ -534,7 +534,7 @@ On top of that, we would like to have slicers next to the map with brands. In th
                 for (var k=0; k<12; k++)
                     chartTable.setValue(k, 2, chart4Data.getValue(0,k+13));
 
-                chart4.draw(chartTable, {title : 'Sales vs Last Year\'s', vAxis : {minValue : getMinValue(chartTable)}, hAxis : {slandedText : true, slantedTextAngle : 50}, animation : {startup : true, duration : 1000, easing : 'out'}, legend : {position : 'none'}});
+                chart4.draw(chartTable, {colors : ['#1b5e20', '#26a69a'], title : 'Sales vs Last Year\'s', vAxis : {minValue : getMinValue(chartTable)}, hAxis : {slandedText : true, slantedTextAngle : 50}, animation : {startup : true, duration : 1000, easing : 'out'}, legend : {position : 'none'}});
    			}
             
    			// Add callback to click on map event
@@ -654,7 +654,7 @@ On top of that, we would like to have slicers next to the map with brands. In th
     
     <article>
         <div>
-            <div id="regions_div" style="width:95%; margin:0 auto; padding: 10px; background-color: #795548;" ></div>
+            <div id="regions_div" style="width:95%; margin:0 auto; padding: 10px;" ></div>
         </div>
 
         <br>
