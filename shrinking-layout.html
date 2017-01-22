@@ -182,6 +182,40 @@ On top of that, we would like to have slicers next to the map with brands. In th
         function openNav() {
             document.getElementById("mySidenav").style.width = "16em";
         }
+        
+        var isMapShrinked = false;
+        function shrinkMap() {
+            var btn = document.getElementById("expand_map");
+            var reg = document.getElementById("region_outdiv");
+            var crt = document.getElementById("charts_outdiv");
+            var cr1 = document.getElementById("chart1_div");
+            var cr2 = document.getElementById("chart2_div");
+            var cr3 = document.getElementById("chart3_div");
+            var cr4 = document.getElementById("chart4_div");
+            if (isMapShrinked == false) {
+                btn.innerHTML = "&#x226B;";
+                reg.style.width = "45%";
+                reg.style.float = "left";
+                crt.style.width = "45%";
+                crt.style.float = "right";
+                cr1.style.width = "95%";
+                cr2.style.width = "95%";
+                cr3.style.width = "95%";
+                cr4.style.width = "95%";
+                isMapShrinked = true;
+            }
+            else {
+                btn.innerHTML = "&#x226A;";
+                reg.style.width = "100%";
+                crt.style.width = "100%";
+                cr1.style.width = "45%";
+                cr2.style.width = "45%";
+                cr3.style.width = "45%";
+                cr4.style.width = "45%";                
+                isMapShrinked = false;
+            }
+            window["callDraw"]();
+        }
 
         function closeNav() {
             document.getElementById("mySidenav").style.width = "0";
@@ -349,6 +383,10 @@ On top of that, we would like to have slicers next to the map with brands. In th
                 }
             }
             
+            callDraw = function() {
+                redrawMap();
+            }
+            
    			// Draws or redraws the map with the selected options and data
             function redrawMap(){
    				// Select which column to aggregate by (areaDisplayed) and which data column to display (colDisplayed) in the map
@@ -368,6 +406,7 @@ On top of that, we would like to have slicers next to the map with brands. In th
                 
                 dataViewAggr = google.visualization.data.group(dataView, [areaDisplayed], [{'column': colDisplayed, 'aggregation': google.visualization.data.sum, 'type': 'number'}]);
 				mapOptions = {
+                    keepAspectRatio: true,
                     region: mapFoc, 
                     resolution: resDisplayed,
                     backgroundColor: {fill: '#81d4fa', stroke: '#607D8B', strokeWidth: 8},
@@ -642,25 +681,31 @@ On top of that, we would like to have slicers next to the map with brands. In th
     
     <nav>
         <span style="font-size:30px;cursor:pointer;color:#607D8B" onclick="openNav()">&#9776;</span>
+        <br>
+        <span id="expand_map" style="font-size:40px;cursor:pointer;color:#607D8B" onclick="shrinkMap()">&#x226A;</span>
     </nav>
     
     <article>
         <div>
-            <div id="regions_div" style="width:95%; margin:0 auto; padding: 10px;" ></div>
-        </div>
+            <div id="region_outdiv">
+                    <div id="regions_div" style="width:95%; margin:0 auto; padding: 10px;" ></div>
+            </div>
 
-        <br>
-        
-        <div id="columnCharts" style="width:95%; margin:0 auto; padding: 10px;">
-            <div class="leftElement" id="chart1_div"></div>
-            <div class="rightElement" id="chart2_div"></div>
-        </div>
-        
-        <br>
-        
-        <div style="width:95%; margin:0 auto; padding: 10px;">
-            <div class="leftElement" id="chart3_div"></div>
-            <div class="rightElement" id="chart4_div"></div>
+
+
+            <div id="charts_outdiv" >
+                <div id="columnCharts" style="width:95%; margin:0 auto; padding: 10px;">
+                    <div class="leftElement" id="chart1_div"></div>
+                    <div class="rightElement" id="chart2_div"></div>
+                </div>
+
+                <br>
+
+                <div style="width:95%; margin:0 auto; padding: 10px;">
+                    <div class="leftElement" id="chart3_div"></div>
+                    <div class="rightElement" id="chart4_div"></div>
+                </div>
+            </div>
         </div>
         
         <div id="table_div" style="padding-left: 60px; padding-right: 60px; padding-top: 30px" align="center"></div>
