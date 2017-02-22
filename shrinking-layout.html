@@ -298,6 +298,8 @@ On top of that, we would like to have slicers next to the map with brands. In th
             var monthMap = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             // Array containing all brands
             var brandsArray = [];
+            
+            var defaultRegion = 150;
 
             // Columns generation
             var i = 0;
@@ -332,6 +334,8 @@ On top of that, we would like to have slicers next to the map with brands. In th
             
        		// Initial draw of the map 
        		redrawMap();
+            
+            defaultPlots(019);
             
             // Populate the 'brandsForm' element with checkboxes for brands
             function addCheckbox() {
@@ -485,11 +489,96 @@ On top of that, we would like to have slicers next to the map with brands. In th
                 }
                 return min;
             }
+            
+            function defaultPlots() {
+                var colArray = [];
+                dataView.setRows(data.getFilteredRows([{
+                    column: 3, 
+                    test: function (value, row, column, table) {
+                        var res = false;
+                        for (var i=0; i<brandsArray.length; i++) {
+                            if ((brandsArray[i].brand == value) &&
+                                (brandsArray[i].checked) &&
+                                (data.getValue(row, areaDisplayed) == defaultRegion)) {
+                                res = true;
+                                break;
+                            }
+                        }
+                        return (res);
+                    }
+                }]));
+                
+                /********************************************************************************/
+                // Table drawing
+                tableView = new google.visualization.DataView(dataView);
+                tableView.setColumns([0,1,2,3,4,17,30,43,56,69,82]);
+       			table.draw(tableView, {frozenColumns: 5, showRowNumber: true, page: 'enable', pageSize: 20, pagingButtons: 'both'});
+                
+                /********************************************************************************/
+                // Chart 1 drawing
+                for (var k=0; k<12; k++)
+                    colArray.push({'column': k+5, 'aggregation': google.visualization.data.sum, 'type': 'number'});
+                for (var k=0; k<12; k++)
+                    colArray.push({'column': k+18, 'aggregation': google.visualization.data.sum, 'type': 'number'});
+
+                chart1Data = google.visualization.data.group(dataView, [areaDisplayed], colArray);
+                chartTable.setColumnLabel(1, 'Shipments');
+                chartTable.setColumnLabel(2, 'Target Shipments');
+                for (var k=0; k<12; k++) {
+                    chartTable.setValue(k, 1, chart1Data.getValue(0,k+1));
+                    chartTable.setValue(k, 2, chart1Data.getValue(0,k+13));
+                }
+                
+                chart1.draw(chartTable, {colors : ['#1b5e20', '#26a69a'], title : 'Shipments vs Target', vAxis : {minValue : getMinValue(chartTable)}, hAxis : {slandedText : true, slantedTextAngle : 50}, animation : {startup : true, duration : 1000, easing : 'out'}, legend : {position : 'none'}});
+
+                /********************************************************************************/
+                // Chart 2 drawing
+                for (var k=0; k<12; k++)
+                    colArray[k+12] = {'column': k+31, 'aggregation': google.visualization.data.sum, 'type': 'number'};
+
+                chart2Data = google.visualization.data.group(dataView, [areaDisplayed], colArray);
+                chartTable.setColumnLabel(2, 'Last Year Shipments');
+                for (var k=0; k<12; k++)
+                    chartTable.setValue(k, 2, chart2Data.getValue(0,k+13));
+
+                chart2.draw(chartTable, {colors : ['#1b5e20', '#26a69a'], title : 'Shipments vs Last Year\'s', vAxis : {minValue : getMinValue(chartTable)}, hAxis : {slandedText : true, slantedTextAngle : 50}, animation : {startup : true, duration : 1000, easing : 'out'}, legend : {position : 'none'}});
+
+                /********************************************************************************/
+                // Chart 3 drawing
+                for (var k=0; k<12; k++) {
+                    colArray[k] = {'column': k+44, 'aggregation': google.visualization.data.sum, 'type': 'number'};
+                    colArray[k+12] = {'column': k+57, 'aggregation': google.visualization.data.sum, 'type': 'number'};
+                }
+
+                chart3Data = google.visualization.data.group(dataView, [areaDisplayed], colArray);
+                chartTable.setColumnLabel(1, 'Sales');
+                chartTable.setColumnLabel(2, 'Target Sales');
+                for (var k=0; k<12; k++) {
+                    chartTable.setValue(k, 1, chart3Data.getValue(0,k+1));
+                    chartTable.setValue(k, 2, chart3Data.getValue(0,k+13));
+                }
+
+                chart3.draw(chartTable, {colors : ['#1b5e20', '#26a69a'], title : 'Sales vs Target', vAxis : {minValue : getMinValue(chartTable)}, hAxis : {slandedText : true, slantedTextAngle : 50}, animation : {startup : true, duration : 1000, easing : 'out'}, legend : {position : 'none'}});
+
+                /********************************************************************************/
+                // Chart 4 drawing
+                for (var k=0; k<12; k++)
+                    colArray[k+12] = {'column': k+70, 'aggregation': google.visualization.data.sum, 'type': 'number'};
+
+                chart4Data = google.visualization.data.group(dataView, [areaDisplayed], colArray);
+                chartTable.setColumnLabel(2, 'Last Year Sales');
+                for (var k=0; k<12; k++)
+                    chartTable.setValue(k, 2, chart4Data.getValue(0,k+13));
+
+                chart4.draw(chartTable, {colors : ['#1b5e20', '#26a69a'], title : 'Sales vs Last Year\'s', vAxis : {minValue : getMinValue(chartTable)}, hAxis : {slandedText : true, slantedTextAngle : 50}, animation : {startup : true, duration : 1000, easing : 'out'}, legend : {position : 'none'}});
+                
+            }
 
 			// Callback function that handles clicks on the map regions
    			function clickHandler(){
        			var selection = map.getSelection();
        			var region = dataViewAggr.getValue(selection[0].row, 0);
+                window.alert(region);
                 var colArray = [];
                 
                 dataView.setRows(data.getFilteredRows([{
@@ -691,6 +780,7 @@ On top of that, we would like to have slicers next to the map with brands. In th
                     <div class="leftElement" id="chart3_div"></div>
                     <div class="rightElement" id="chart4_div"></div>
                 </div>
+                
             </div>
         </div>
         
